@@ -259,3 +259,86 @@ E agora todos os arquivos estáticos da página (html, css, js e imagens) podem 
 
 Observe que é apenas necessário envolver o conteúdo do atributo entre `{% %}` e mencionar que trata-se de um arquivo `static`.
 
+### Trabalhando com mais páginas
+
+Em um mundo normal da web, temos na maioria das vezes mais do que uma única página, sendo assim é interessante que possamos exibir mais do que uma página, e de acordo com a rota passada, renderize uma determinada página, desta forma, aqui vamos aprender a como fazer isso.
+
+Primeiramente, vamos aproveitar que temos um arquivo a mais em `templates` que é o `receita.html`, esse arquivo é uma outra página da nossa aplicação, para que ela seja renderizada temos que fazer algumas coisas:
+
+1. No arquivo `urls.py`, devemos adicionar em `urlpatterns` um novo path que será a nova página, para isso faça o seguinte:
+  
+    ```python
+    urlpatterns = [
+      [...],
+      path('receita', views.receita, name='receita')
+    ]
+    ```
+
+    Isso fará com que agora ele possa chamar a função `receita` dentro de `views.py` e renderize a página `receita.html` quando entrar na rota `/receita`.
+
+2. No arquivo `views.py`, devemos criar a função `receita`, que é a que pedimos para executar quando entrarmos na rota, basicamente conforme falado no passo anterior, conforme o seguinte código:
+   
+    ```python
+    def receita(req):
+      return render(req, 'receita.html')
+    ```
+
+Agora a aplicação já poderá renderizar a página, porém ai já vemos um problema, toda aquela configuração que fizemos anteriormente para que funcionasse a página `index.html` também está acontecendo para a página `receita.html`. Além disso, foi observado muito código repetido e que da para melhorar bastante, utilizando alguns conceitos do Django.
+
+Se observar o arquivo tem uma base, começa e encerra da mesma forma, sendo assim, no Django podemos definir um arquivo que será a base para todas as outras páginas, nesse caso vamos criar um arquivo chamado `base.html` que será a base de toda a aplicação, já importando o CSS e o JavaScript no final do arquivo.
+
+Para definir onde queremos inserir o conteúdo das páginas nessa base, devemos criar um bloco do Django, para criar faça o seguinte:
+
+```django
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="{% static 'site.css' %}">
+
+</head>
+
+<body>
+
+    {% block content %} {% endblock %}
+
+    <!-- ##### All Javascript Files ##### -->
+    <!-- jQuery-2.2.4 js -->
+    <script src="{% static 'js/jquery/jquery-2.2.4.min.js' %}"></script>
+
+```
+
+Observe que temos um `{% block content %}` e também um `{% endblock %}` e isso serve para que possamos definir onde será o conteúdo da página, o nome `content` é um nome que é dado para esse bloco para que possa ser usado para definir na página que vai utilizar essa base depois, onde começará o bloco e onde vai acabar.
+
+Sendo assim, no arquivo `index.html`, você deverá pedir para `extender` o arquivo `base.html`, além disso definir onde começará o bloco e onde acaba, da seguinte forma:
+
+```django
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+  <!-- Todo o conteúdo aqui -->
+{% endblock content %}
+```
+
+É importante ter o `{% load static %}` tanto na `base.html` quanto no arquivo da página que extende esse arquivo, pois nesse arquivo que estamos extendendo a base, possui referências aos arquivos estáticos.
+
+Isso deverá ser repetido na página `receita.html` também, para que funcione igualmente.
+
+#### Partials
+
+Agora outro problema que da para ser observado é que em ambos os arquivos o `menu` e o `footer` são iguais, e caso quiséssemos alterar alguma coisa em algums dos dois, teria que alterar em todos os arquivos, isso pode se tornar um trabalho gigantesco em alta escala.
+
+Para resolver esse problema, existem as `partials`, podemos, por organização, criar uma pasta chamada `partials` dentro da pasta `templates` e ali armazenar um arquivo `menu.html` com o menu e outro arquivo `footer.html` que vai armazenar o rodapé da página.
+
+Sendo assim, devemos extrair da página `index.html` e da página `receita.html` o menu e o rodapé e então passar para os arquivos que criamos.
+
+Após isso, se atualizarmos a página, obviamente não teremos mais nem um menu e nem um rodapé, sendo assim devemos pedir para o Django incluir um determinado arquivo que encontra-se em determinada localização em nosso HTML, para isso faça o seguinte:
+
+```django
+<!-- Conteúdo antes do menu -->
+{% include 'partials/menu.html' %}
+<!-- Conteúdo depois do menu e antes do footer -->
+{% include 'partials/footer.html' %}
+```
+
+Isso fará com que seja renderizado cada parte na página, fazendo com que não precisemos repetir código.
+
+Importante não esquecer de colocar o `{% load static %}` em cada partial.
