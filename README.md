@@ -183,3 +183,18 @@ urlpatterns = [
 ```
 
 Dessa forma, ao salvar esse arquivo e colocar para atualizar a página, verá que agora aparece **`Receitas`** na página principal.
+
+### Incorporando uma página HTML
+
+Ao invés de ser feito completamente na mão, da forma que estava, agora foi usado uma outra estrutura totalmente diferente onde renderiza um arquivo `.html`, e o Django, por padrão irá olhar em uma pasta criada chamada `templates` utilizando apenas o método `render` e não mais o `HttpResponse`, sendo assim esse import pode ser removido.
+
+Vamos lá, então crie uma pasta chamada `templates` dentro da aplicação `receitas`, dentro de templates, crie um arquivo chamado `index.html`, esse arquivo será o que será renderizado na página final.
+
+Após criar a página html, podemos seguir para o arquivo `views.py` e então modificar retirando o `HttpResponse` e trocando apenas pelo `render()`, sendo o primeiro parâmetro a requisição recebida pela função `index()` e o segundo parâmetro o próprio arquivo `index.html` sem precisar passar o caminho, já que conforme informado, o Django já olha no diretório `templates`. O resultado dessas alterações ficou assim:
+
+```python
+from django.shortcuts import render
+
+def index(req):
+  return render(req,'index.html')
+```
