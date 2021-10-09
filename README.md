@@ -198,3 +198,62 @@ from django.shortcuts import render
 def index(req):
   return render(req,'index.html')
 ```
+
+### Renderizando arquivos estáticos
+
+Para que seja possível renderizar arquivos estáticos é necessário que no arquivo `settings.py` seja feito algumas modificações:
+
+Em `TEMPLATES`, terá a opção `DIRS`, você pode adicionar nessa parte o seguinte comando:
+
+```python
+os.path.join(BASE_DIR, 'receitas/templates')
+```
+
+Verifique que é utilizado o pacote `os`, ele precisa ser importado no início do arquivo utilizando o seguinte comando:
+
+```python
+import os
+```
+
+Estamos utilizando esse pacote para fazer a manipulação dos caminhos, juntando o diretório base com o complemento do caminho para chegar na pasta `templates` da aplicação `receitas`.
+
+Mais abaixo, na seção que faz configurações sobre os arquivos estáticos, adicione o `STATIC_ROOT` e `STATICFILES_DIRS` da seguinte forma:
+
+```python
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'alurareceita/static')
+]
+```
+
+Observe que em `STATIC_ROOT` é informado onde será armazenado a raíz dos arquivos estáticos, nesse caso será no diretório base do projeto, na pasta `static`.
+
+Na pasta `static` dentro do projeto `alurareceita` ficará os mesmos arquivos estáticos.
+
+Existe um comando que pode executar no terminal para que o Django colete esses arquivos estáticos e coloquem no repositório do projeto, o comando é o seguinte:
+
+```powershell
+python manage.py collectstatic
+```
+
+Fazendo isso, o projeto já estará configurado para encontrar os arquivos estáticos.
+
+Agora, dentro dos arquivos `index.html` e `receitas.html` você conseguirá mencionar para que seja utilizado os arquivos estáticos, primeiro é preciso carregar eles, para isso no início do arquivo digite o seguinte:
+
+```django
+{% load static %}
+```
+
+E agora todos os arquivos estáticos da página (html, css, js e imagens) podem ser encontrados da seguinte maneira:
+
+```django
+<!-- Favicon -->
+<link rel="icon" href="{% static 'img/core-img/favicon.ico' %}">
+
+<!-- Stylesheet -->
+<link rel="stylesheet" href="{% static 'site.css' %}">
+```
+
+Observe que é apenas necessário envolver o conteúdo do atributo entre `{% %}` e mencionar que trata-se de um arquivo `static`.
+
