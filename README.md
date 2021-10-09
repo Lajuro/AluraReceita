@@ -227,9 +227,11 @@ STATICFILES_DIRS = [
 ]
 ```
 
-Observe que em `STATIC_ROOT` é informado onde será armazenado a raíz dos arquivos estáticos, nesse caso será no diretório base do projeto, na pasta `static`.
+Observe que em `STATIC_ROOT` é informado onde será armazenado a raíz dos arquivos estáticos, nesse caso será no diretório base do projeto, na pasta `static`. Usamos esta configuração para indicar o caminho absoluto, onde o `collectstatic` coletará os arquivos estáticos.
 
-Na pasta `static` dentro do projeto `alurareceita` ficará os mesmos arquivos estáticos.
+Na pasta `static` dentro do projeto `alurareceita` ficará os mesmos arquivos estáticos. Em `STATICFILES_DIRS` define os locais adicionais que o aplicativo `staticfiles` percorrerá se o localizador FileSystemFinder estiver ativado, por exemplo. Se você usar o comando de gerenciamento `collectstatic` ou `findstatic` ou usar a exibição de exibição de arquivo estático.
+
+Sobre o `STATIC_URL`, usamos para referência a arquivos estáticos localizados no `STATIC_ROOT`.
 
 Existe um comando que pode executar no terminal para que o Django colete esses arquivos estáticos e coloquem no repositório do projeto, o comando é o seguinte:
 
