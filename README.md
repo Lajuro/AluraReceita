@@ -107,4 +107,79 @@ A seguir, deixarei algumas anotações sobre os arquivos criados pelo Django:
 
   É um ponto de integração para os servidores web compatíveis com WSGI, porém é um assunto que não é tratado neste curso.
 
+## Criação do App
 
+Para a criação do aplicativo, é necessário alguns procedimentos iniciais, o comando de criação de um aplicativo pertencente ao Alura Receitas, é o seguinte:
+
+```powershell
+python manage.py startapp receitas
+```
+
+O comando `startapp` é o qual cria uma aplicação com alguns arquivos padrões do próprio Django. Neste caso foi criado uma aplicação chamada `receitas`.
+
+Dentro do arquivo `app.py`, que foi criado na aplicação `receitas`, você consegue definir o nome da aplicação, no nosso caso é `receitas`.
+
+Já no arquivo `settings.py` agora devemos adicionar `receitas` na lista `INSTALLED_APPS`.
+
+### Configurando arquivo `urls.py` da aplicação `receitas`
+
+Este arquivo não vem criado, então é necessário criá-lo e nele será definido as urls da aplicação.
+
+Primeiramente é necessário realizar o `import` do pacote `urls`:
+
+```python
+from django.urls import path
+```
+
+Também necessário importar todas as urls, para isso faça o seguinte:
+
+```python
+from django.urls import path
+from . import views
+```
+
+O arquivo `views.py` é o responsável por exibir na tela o que for criado por aqui. Vamos agora criar o a variável `urlpatterns` e inserir o primeiro `path`, para que possa pegar a rota principal, apenas deve passar o primeiro parâmetro como `''`, o segundo parâmetro como `views.index` que é o responsável por atender a requisição e finalmente o terceiro e último parâmetro, que é o `name='index'` sendo o namespace do aplicativo para estas entradas `urls`.
+
+O arquivo, por enquanto, ficará assim:
+
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+  path('', views.index, name='index')
+]
+```
+
+Precisamos agora criar a view `index` que será renderizada ao acessar a url principal `/` da aplicação.
+
+Para isso é preciso criar uma função chamado `index` que tem como primeiro parâmetro a requisição que é recebida.
+
+Será necessário importar o pacote `http` do Django que é o `HttpResponse`, essa função será responsável por dar uma resposta na página.
+
+O arquivo `views.py` da aplicação `receitas` ficará da seguinte forma:
+
+```python
+from django.http import HttpResponse
+
+def index(req):
+  return HttpResponse("<h1>Receita</h1>")
+```
+
+Após salvar tanto o arquivo `urls.py` e o `views.py`, ao atualizar a página, verá que nada mudou, isso porque ainda falta um último detalhe.
+
+Assim como foi necessário atualizar o arquivo `urls.py`, que é onde está todas as `urls` de `receitas`, dentro de `alurareceita` tem outro `urls.py` que é o responsável por todas as `urls` de toda a aplicação.
+
+Sendo assim, abra o arquivo `urls.py` e dentro de `urlpatterns`, será adicionado um outro `path` além do que já está ali e para isso será necessário utilizar o método `include()` que já é do próprio `django.urls`. Será necessário então falar para o Django que a rota principal, que no caso é representado uma string vazia `''` deverá incluir todas as urls da aplicação `receitas` a partir do path `''`, sendo assim o arquivo `urls.py` da pasta `alurareceita` ficará da seguinte forma:
+
+```python
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('', include('receitas.urls')),
+    path('admin/', admin.site.urls),
+]
+```
+
+Dessa forma, ao salvar esse arquivo e colocar para atualizar a página, verá que agora aparece **`Receitas`** na página principal.
